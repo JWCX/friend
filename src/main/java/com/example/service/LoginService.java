@@ -68,6 +68,8 @@ public class LoginService {
 	@Autowired
 	private FriendService friendService;
 	@Autowired
+	private BoardService boardService;
+	@Autowired
 	private FriendRepository friendRepository;
 	@Autowired
 	private ChatRoomRepository chatRoomRepository;
@@ -117,8 +119,13 @@ public class LoginService {
       map.put("notifications", chatService.GetAlarmList(userid));
       map.put("myFriends", userFunction.ListToMap(friendRepository.getLoginFriendList(userid),"id"));
       map.put("popularGroups", clubService.topClub());
-      map.put("popularFriends", friendService.popularUsers());
+      map.put("popularUsers", friendService.popularUsers());
+      Map<String,Object> popular = boardService.getPopularPosts(userid);
+      map.put("popularPosts", popular.get("posts"));
+      map.put("popularPostsIndex", popular.get("index"));
       map.put("token", userid);
+      
+      System.out.println("PPPPOP" + map.get("popularPosts"));
       
       //상세정보가 등록되어 있으면
       if(userRepository.findByemail(email).getName() != null) {

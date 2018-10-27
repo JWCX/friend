@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -38,7 +39,7 @@ public class FriendService {
    private UserFunction userFunction;
 
 // 1-1-4 인기친구
-   public Map<String, Object> popularUsers() {
+   public Map<Integer, Object> popularUsers() {
       // 인기친구 쿼리
       List<User> userList = userRepository.topFriends();
       // 구분 1: 회원
@@ -47,10 +48,16 @@ public class FriendService {
       Map<Integer, Object> popUserMap = new HashMap<>();
       for (User u : userList) {
          Map<String, Object> UserMap = new HashMap<>();
-         // userid 맵
          UserMap.put("id", u.getUserid());
-         // name 맵
          UserMap.put("nickName", u.getName());
+         UserMap.put("gender", u.getGender());
+         
+         if (u.getBirth() != null) {
+	         UserMap.put("age", new Date().getYear() - u.getBirth().getYear() + 1);
+	     } else {
+	         UserMap.put("age", null);
+	     }
+         
          List<Map<String, String>> imgsList = new ArrayList<Map<String, String>>();
          // 구분1, 유저아이디 에 해당하는 imgpath
          // 이미지 맵
@@ -64,11 +71,8 @@ public class FriendService {
          popUserMap.put(u.getUserid(), UserMap);
 
       }
-
-      Map<String, Object> popularUsersMap = new HashMap<String, Object>();
-      popularUsersMap.put("popularUsers", popUserMap);
-
-      return popularUsersMap;
+      
+      return popUserMap;
    }
 
 // 3-2

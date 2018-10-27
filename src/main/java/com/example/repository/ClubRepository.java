@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.UserFunction;
 import com.example.model.Club;
 
 public interface ClubRepository extends JpaRepository<Club, Integer>{
@@ -18,7 +19,7 @@ public interface ClubRepository extends JpaRepository<Club, Integer>{
 	public List<Object> aa(@Param("clubid") int clubid);
 	
 	//최재현
-		@Query(value="select c.clubid id,c.name groupName,i.imgpath image from club c ,clubuser cu,img i where c.clubid=cu.clubid and cu.userid=:userid and i.gubun=2 and c.clubid=i.id group by c.clubid limit :start,:end",nativeQuery=true)
+		@Query(value="select c.clubid id,c.name groupName,CONCAT('" + UserFunction.ImgPath + "', i.imgpath) image from club c ,clubuser cu,img i where c.clubid=cu.clubid and cu.userid=:userid and i.gubun=2 and c.clubid=i.id group by c.clubid limit :start,:end",nativeQuery=true)
 	   public List<Map<String,Object>> getuserClubinfo(@Param("userid")int userid,@Param("start")int start,@Param("end")int end);
 	
 	   @Query(value = "select c.* from club c where c.clubid=:clubid", nativeQuery = true)
@@ -30,7 +31,7 @@ public interface ClubRepository extends JpaRepository<Club, Integer>{
 	         + "    group by id) a  " + "on c.clubid = a.id " + "  left join " + "  (select clubid, count(*) nocnt "
 	         + "    from clubnotice " + "  where date(writedate) >= date(subdate(now(), Interval 30 day)) "
 	         + " group by clubid) b " + "  on c.clubid = b.clubid "
-	         + "order by (ifnull(a.hitcnt,0) + ifnull(b.nocnt,0))  desc " + " limit 6;", nativeQuery = true)
+	         + "order by (ifnull(a.hitcnt,0) + ifnull(b.nocnt,0))  desc " + " limit 10;", nativeQuery = true)
 	   public List<Club> topGroup();
 
 	   

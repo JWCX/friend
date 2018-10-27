@@ -216,6 +216,8 @@ public class UserFunction {
 					imgRepository.save(img);
 
 				}
+				System.out.println("new"+newImg.size());
+				System.out.println("imglist" + imgs.size());
 				   }
 			} catch (JSONException e1) {
 				e1.printStackTrace();

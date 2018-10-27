@@ -6,7 +6,6 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -44,11 +43,10 @@ public class FriendController {
       return resultMap;
    }
    
-   // 1-1-4 인기친구
-   @RequestMapping(value="/loginfriend", method=RequestMethod.POST)
-   public Map<String, Object> popularUsers(){
-      return friendService.popularUsers();
-   }
-   
-
+//   // 1-1-4 인기친구
+//   @RequestMapping(value="/loginfriend", method=RequestMethod.POST)
+//   public Map<Integer, Object> popularUsers(){
+//      return friendService.popularUsers();
+//   }
+//   
 }

@@ -89,7 +89,7 @@ public class UserController {
 	      return new ResponseEntity<>(HttpStatus.OK);
 	   }
 	   //2-6-2 (친구 신청 취소), 2-7(친구 삭제)
-	   @DeleteMapping("/friend")
+	   @PostMapping("/friend/delete")
 	   public ResponseEntity<?> deleteFriend(@RequestBody String json) throws JSONException{
 	      
 	      userService.setFriendState(json, 7);

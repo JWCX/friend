@@ -1,35 +1,22 @@
 package com.example.controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import javax.transaction.Transactional;
-
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
-import com.example.model.Club;
-import com.example.model.Clubnotice;
-import com.example.model.Clubuser;
 import com.example.service.ClubService;
-import com.mysql.fabric.xmlrpc.base.Array;
 
 
 
@@ -172,9 +159,7 @@ public class ClubController {
       //그룹 게시글 조회하기
       @RequestMapping("/group/board")
       public Map<String,Object> readBoard(int token,int id,int page){
-    	  
     	  return clubService.readBoard(token,id,page);
-      
       }
       
       

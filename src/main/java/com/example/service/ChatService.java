@@ -162,6 +162,7 @@ public class ChatService {
 		String nickName, image;
 
 		nickName = userInfo.get("nickName").toString();
+		System.out.println(userInfo.get("image"));
 		image = userInfo.get("image").toString();
 
 		Map<String, Object> map= new HashMap<>(); 

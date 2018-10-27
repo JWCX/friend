@@ -133,18 +133,8 @@ public class UserService {
       int friendsCount = 0;
       int clubsCount = 0;
 
-      // 친구 목록 카운트
-      if (friendRepository.friendsCount(userid) % 10 == 0) {
-         friendsCount = friendRepository.friendsCount(userid) / 10;
-      } else {
-         friendsCount = friendRepository.friendsCount(userid) / 10 + 1;
-      }
-      
-      if (clubUserRepository.clubCount(userid) % 10 == 0) {
-         clubsCount = clubUserRepository.getUserClubinfo(userid, 2).size() / 10;
-      } else {
-         clubsCount = clubUserRepository.getUserClubinfo(userid, 2).size() / 10 + 1;
-      }
+      friendsCount = (int)Math.ceil(friendRepository.friendsCount(userid) / 10.0);
+      clubsCount = (int)Math.ceil(clubUserRepository.getUserClubinfo(userid, 2).size() / 10.0);
       int firstNum = 0;
 
       List<Map<String, Object>> _friendsList = null;
@@ -399,7 +389,9 @@ public class UserService {
          friendRepository.save(friend);
          break;
       case 7: // 유저 삭제
+    	  System.out.println("moya");
          friendRepository.deleteFriend(token, id);
+         break;
       }
 	return null;
    }

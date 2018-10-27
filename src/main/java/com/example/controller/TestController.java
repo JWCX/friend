@@ -1,10 +1,6 @@
 package com.example.controller;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,15 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.example.UserFunction;
-import com.example.model.User;
-import com.example.repository.UserRepository;
 import com.example.service.ChatService;
-import com.example.service.FriendService;
-import com.example.service.LoginService;
 import com.example.service.TestService;
 import com.example.service.UserService;
 
@@ -35,16 +24,16 @@ public class TestController {
 	@Autowired
 	private ChatService chatService;
 
-	@Autowired
-	private LoginService loginService;
+//	@Autowired
+//	private LoginService loginService;
 	
 	@Autowired
 	private UserService userService;
-	@Autowired
-	private FriendService friendService;
+//	@Autowired
+//	private FriendService friendService;
 
-	   @Autowired
-	   private UserRepository userRepository;
+//	   @Autowired
+//	   private UserRepository userRepository;
 
 	   
 	   //test

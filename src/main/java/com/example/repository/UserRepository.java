@@ -20,7 +20,7 @@ public interface UserRepository extends JpaRepository<User, Integer>{
 	   public String getUserEmail(@Param("userid") int userid);
 
 	@Query(value="select u.userid, u.name nickname, CONCAT('" + UserFunction.ImgPath + "', i.imgpath) image " + 
-			"	  from user u left join (select id, imgpath from img where gubun = 1 and id = 1 group by id) i on (u.userid = i.id)  " + 
+			"	  from user u left join (select id, imgpath from img where gubun = 1 and id = :userid group by id) i on (u.userid = i.id)  " + 
 			"	  where u.userid =:userid" ,nativeQuery=true)
 	   public Map<String, Object> getUserInfo(@Param("userid") int userid);
 	  
@@ -45,7 +45,7 @@ public interface UserRepository extends JpaRepository<User, Integer>{
 	         "on u.userid = a.id left join " + 
 	         " (select userid, count(*) nocnt from noticecom " + 
 	         "  where date(writedate) >= date(subdate(now(), Interval 30 day)) group by userid) b " + 
-	         " on u.userid = b.userid order by (ifnull(a.hitcnt,0) + ifnull(b.nocnt,0)) desc limit 6;", nativeQuery = true)
+	         " on u.userid = b.userid order by (ifnull(a.hitcnt,0) + ifnull(b.nocnt,0)) desc limit 10;", nativeQuery = true)
 	   public List<User> topFriends();
 	   
 	   

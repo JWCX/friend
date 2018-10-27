@@ -1,6 +1,5 @@
 package com.example.repository;
 
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,5 +15,4 @@ public interface HitRepository extends JpaRepository<Hit, Integer>{
 	@Query(value="select * from hit where gubun=:gubun and id=:id and userid=:userid and hittime"
 			+ " >= date(subdate(now(),interval 1 day))",nativeQuery=true)
 	public List<Hit> addReadCount(@Param("gubun")int gubun,@Param("id")int id,@Param("userid")int userid);
-	
 }
