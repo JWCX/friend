@@ -27,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.model.Club;
 import com.example.model.Clubnotice;
+import com.example.model.Clubuser;
 import com.example.service.ClubService;
 import com.mysql.fabric.xmlrpc.base.Array;
 
@@ -40,43 +41,36 @@ public class ClubController {
    
    @Autowired
    private ClubService clubService;
-   
-
+  
    //그룹검색 보내줌
-   
    @RequestMapping("/groups")
    public Map<String,Object> searchGroup(@RequestParam(defaultValue="1") int page,@RequestParam(defaultValue="false") boolean filter,String keyword,
          @RequestParam(defaultValue="0")int searchOption,@RequestParam(defaultValue="0")int si,@RequestParam(defaultValue="0")int gu,
          @RequestParam(defaultValue="0")int gender,@RequestParam(defaultValue="0")int minAge,@RequestParam(defaultValue="0")int maxAge,
          @RequestParam(defaultValue="0")int interest,@RequestParam(defaultValue="0") int token){
-      
       return clubService.searchGroups(page, filter, keyword, searchOption, si, gu, gender, minAge, maxAge, interest,token);
    }
-   
-   
-   
-   
    
    //그룹상세정보 보내줌
    @RequestMapping("/group")
    public Map<String,Object> groupinfo(int token,int id) throws IOException{
-	 
       return  clubService.groupInfo(token, id,1);
+   }
+   
+   //그룹 멤버 조회
+   @RequestMapping("/group/member")
+   public Map<String,Object> groupMember(Integer token, Integer id, Integer page) throws IOException{
+ 	  return clubService.groupMember(token,id,page);
    }
    
    //ModelAttribute : 모델클래스로 데이터 가져올때
    
-   
    //4-2 그룹개설 or 수정
-   
    @PostMapping("/group/info")
    public ResponseEntity<Map<String, Object>> creategroup(@RequestBody String json) throws JSONException, IOException{
-	   
-	  
 	   return new ResponseEntity<>(clubService.createUpdate(json),HttpStatus.OK);
    }
    
-  
 
    
    //4-4-2 그룹 가입 신청
@@ -92,7 +86,6 @@ public class ClubController {
 		clubid=obj.getInt("id");
 		userid=obj.getInt("token");
 		message = obj.getString("message");
-
 	
 //	   int clubid,int userid,String message
       //가입신청 성공하면 clubuser테이블에 추가,마스터에게 알람 이 가고 실패시 Bad_Request
@@ -103,7 +96,6 @@ public class ClubController {
       else {
          return new ResponseEntity<Boolean>(false,HttpStatus.BAD_REQUEST);
       }
-      
       
    }
  /*  //4-4-3 그룹 가입 신청허락 폼
@@ -176,15 +168,7 @@ public class ClubController {
     		  
     	  }
       }
-      
-      //그룹 멤버 조회
-      @RequestMapping("/g"
-      		+ "roup/member")
-      public Map<String,Object> groupMember(Integer token,int id,int page){
-    	  
-    	  return clubService.groupMember(token,id,page);
-      }
-      
+    
       //그룹 게시글 조회하기
       @RequestMapping("/group/board")
       public Map<String,Object> readBoard(int token,int id,int page){
