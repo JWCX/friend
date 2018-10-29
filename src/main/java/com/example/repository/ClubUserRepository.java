@@ -14,13 +14,13 @@ import com.example.model.Clubuser;
 
 public interface ClubUserRepository extends JpaRepository<Clubuser, Integer>{
    //유저수 구하기
-   @Query(value="select count(*) from clubuser c where c.clubid=:clubid",nativeQuery=true)
+   @Query(value="select count(*) from clubuser c where c.clubid=:clubid and c.userstate=2",nativeQuery=true)
    public int getMemberCount(@Param("clubid") int clubid);
    
    //해당그룹의 유저들 정보
-   @Query(value="select c.userid from clubuser c where c.clubid=:clubid",nativeQuery=true)
+   @Query(value="select c.userid from clubuser c where c.clubid=:clubid and c.userstate=2",nativeQuery=true)
    public List<Integer> getMemberId(@Param("clubid") int clubid);
-   @Query(value="select * from clubuser where clubid=:clubid",nativeQuery=true)
+   @Query(value="select * from clubuser where clubid=:clubid and userstate=2",nativeQuery=true)
    public List<Clubuser> getclubuser(@Param("clubid") int clubid);
    //마스터의 seq값
    @Query(value="select userid from clubuser where clubid=:clubid and auth=1",nativeQuery=true)
@@ -34,7 +34,7 @@ public interface ClubUserRepository extends JpaRepository<Clubuser, Integer>{
    //그룹가입신청 허락
    @Transactional
    @Modifying
-   @Query(value="update clubuser set userstate=2 where clubid=:clubid and userid=:userid",nativeQuery=true)
+   @Query(value="update clubuser set userstate=2, joindate=now() where clubid=:clubid and userid=:userid",nativeQuery=true)
    public void allowGroup(@Param("clubid")int clubid,@Param("userid")int userid);
    
    //그룹가입신청 거절
@@ -59,7 +59,7 @@ public interface ClubUserRepository extends JpaRepository<Clubuser, Integer>{
    @Query(value="SELECT count(*) FROM clubuser WHERE userid = :userid", nativeQuery=true)
 	public Integer clubCount(@Param("userid") int userid);
 
-	@Query(value="select c.clubid,c.name,i.imgpath from club c ,clubuser cu,img i where c.clubid=cu.clubid and cu.userid=:userid and i.gubun=:gubun and c.clubid=i.id group by c.clubid",nativeQuery=true)
+	@Query(value="select c.clubid,c.name,i.imgpath from club c ,clubuser cu,img i where c.clubid=cu.clubid and cu.userid=:userid and i.gubun=:gubun and c.clubid=i.id and cu.userstate=2 group by c.clubid",nativeQuery=true)
 	   public List<Map<String,Object>> getUserClubinfo(@Param("userid")int userid, @Param("gubun")int gubun);
 	
 

@@ -22,6 +22,9 @@ public interface ImgRepository extends JpaRepository<Img, Integer>{
 	   
 	   @Query(value="select CONCAT('" + UserFunction.ImgPath + "', imgpath) imgpath from img where gubun=:gubun and id=:id group by id",nativeQuery=true)
 	   public String getImg(@Param("gubun")int gubun,@Param("id")int id);
+
+	   @Query(value="select CONCAT('" + UserFunction.ImgPath + "', min(imgpath)) imgpath from img where gubun=:gubun and id=:id",nativeQuery=true)
+	   public String getIMG(@Param("gubun")int gubun,@Param("id")int id);
 	   
 	   @Transactional
 	   @Query(value="delete from img where gubun=:gubun and id=:id",nativeQuery=true)

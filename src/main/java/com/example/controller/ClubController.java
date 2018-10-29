@@ -64,15 +64,12 @@ public class ClubController {
    //request : ?clubid=integer&token=String
    //response : """{ success : Boolean } 가입성공:OK , 가입실패:BAD_REQUEST"""
    @PostMapping("/group/request")
-   public ResponseEntity<Boolean> groupJoin2(@RequestBody String json) throws JSONException {
-	   JSONObject obj=new JSONObject(json);
-	   int clubid;
-	   int userid;
-	   String message;
-	
-		clubid=obj.getInt("id");
-		userid=obj.getInt("token");
-		message = obj.getString("message");
+   public ResponseEntity<Boolean> groupJoin2(@RequestBody String json) throws Exception {
+	   JSONObject obj = new JSONObject(json);
+	   System.out.println("why" + obj);
+	   int clubid = obj.getInt("id");
+	   int userid = obj.getInt("token");
+	   String message = obj.getString("message");
 	
 //	   int clubid,int userid,String message
       //가입신청 성공하면 clubuser테이블에 추가,마스터에게 알람 이 가고 실패시 Bad_Request
@@ -103,12 +100,11 @@ public class ClubController {
     	  int notification;
     	  token=obj.getInt("token");
     	  id=obj.getInt("id");
-    	  groupid=obj.getInt("groupid");
+    	  groupid=obj.getInt("groupId");
     	  notification=obj.getInt("notification");
          	if(true) {
-         		
          		clubService.allowGroupJoin2(token,id,groupid,notification);
-            return new ResponseEntity<>(HttpStatus.OK);
+         		return new ResponseEntity<>(HttpStatus.OK);
          	}
          	else {
          		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -128,7 +124,7 @@ public class ClubController {
     	  int notification;
     	  token=obj.getInt("token");
     	  id=obj.getInt("id");
-    	  groupid=obj.getInt("groupid");
+    	  groupid=obj.getInt("groupId");
     	  notification=obj.getInt("notification");
     	  if(true) {
     		  
@@ -144,7 +140,7 @@ public class ClubController {
       public ResponseEntity<String> deleteGroup(@RequestBody String json) throws JSONException{
     	  JSONObject obj=new JSONObject(json);
     	  int token=obj.getInt("token");
-    	  int groupid=obj.getInt("groupid");
+    	  int groupid=obj.getInt("id");
 //    	  int token,int groupid
     	  if(true) {
     		  clubService.deleteGroupUser(token,groupid);
@@ -152,7 +148,6 @@ public class ClubController {
     	  }
     	  else {
     		  return new ResponseEntity<>(HttpStatus.BAD_REQUEST);  
-    		  
     	  }
       }
     

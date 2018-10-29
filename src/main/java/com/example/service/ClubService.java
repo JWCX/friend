@@ -225,31 +225,6 @@ public class ClubService {
       return resultList;
    }
 
-   // 그룹유저정보 가져오기(인원수)
-   public List<List<Clubuser>> getMembercnt(int page, boolean filter, String keyword, int searchOption, int si, int gu,
-         int gender, int minAge, int maxAge, int interest, int userid) {
-      CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-      CriteriaQuery<Clubuser> query = builder.createQuery(Clubuser.class);
-      Root<Clubuser> root = query.from(Clubuser.class);
-      List<Predicate> predicates = new ArrayList<>();
-      List<Club> clubList = searchGroup(page, filter, keyword, searchOption, si, gu, gender, minAge, maxAge, interest,
-            userid);
-      TypedQuery<Clubuser> typedQuery;
-      List<Clubuser> userList = new ArrayList<>();
-      List<List<Clubuser>> result = new ArrayList<>();
-      for (int i = 0; i < clubList.size(); i++) {
-         predicates.add(builder.equal(root.get("clubid"), clubList.get(i).getClubid()));
-         query.select(root.get("clubid")).where(predicates.toArray(new Predicate[] {}));
-
-         typedQuery = entityManager.createQuery(query);
-         userList = typedQuery.getResultList();
-         result.add(userList);
-         predicates.remove(0);
-
-      }
-      return result;
-   }
-
    // 보내줄 그룹정보 4-1
    public Map<String, Object> groupInfo(int userid, int seq,int page) {
 	      List<Integer> userList = new ArrayList<>();
@@ -505,8 +480,6 @@ public class ClubService {
          List<Map<String, Object>> groups = new ArrayList<>();
          List<List<Clubinterest>> interestList = getClubInterestList(page, filter, keyword, searchOption, si, gu,
                gender, minAge, maxAge, interest, userid);
-         List<List<Clubuser>> userList = getMembercnt(page, filter, keyword, searchOption, si, gu, gender, minAge,
-               maxAge, interest, userid);
          Map<String, Object> returnMap = new HashMap<>();
          Map<String, Object> mMap = new HashMap<>();
 
@@ -517,12 +490,11 @@ public class ClubService {
             	  Map<String, Object> map = new HashMap<>();
                   map.put("id", clubList.get(i).getClubid());
                   map.put("groupName", clubList.get(i).getName());
-                  map.put("memberCnt", userList.get(i).size());
+                  map.put("memberCnt", clubUserRepository.getMemberCount(clubList.get(i).getClubid()));
                   map.put("maxMember", clubList.get(i).getMaxcount());
                   map.put("image",imgRepository.getImg(2, clubList.get(i).getClubid()));
                   map.put("intro", clubList.get(i).getContent());
                   map.put("interests", interestList.get(i));
-                 
                   
                   map.put("si",  clubRepository.groupInfo(clubList.get(i).getClubid()).getCity());
                   map.put("gu",  clubRepository.groupInfo(clubList.get(i).getClubid()).getGu());
@@ -979,7 +951,7 @@ public class ClubService {
    // request : ?clubid=integer&token=String
    // response : """{ success : Boolean } 가입성공:OK , 가입실패:BAD_REQUEST"""
    // 멤버수제한 설정안함... 내일와서하기!
-   public int groupJoin2(int clubid, int userid, String message) {
+   public int groupJoin2(int clubid, int userid, String message) throws Exception {
       Club c = clubRepository.groupInfo(clubid);
       User u = userRepository.getUser(userid);
       int userage = userFunction.UserAge(u.getBirth());
@@ -988,76 +960,44 @@ public class ClubService {
       int membercount = clubUserRepository.getMemberCount(clubid);
       int maxmember = clubRepository.groupInfo(clubid).getMaxcount();
       if (membercount < maxmember) {
-
-         if (c.getGender() == 3) {
-            if (c.getAgestart() < userage && c.getAgeend() > userage) {
-               // 가입가능
-               cu.setAuth(9);
-               cu.setBreakdate(null);
-               cu.setClubid(clubid);
-               cu.setId(0);
-               cu.setJoindate(null);
-               cu.setMessage(message);
-               cu.setReqdate(new Date());
-               cu.setUserid(userid);
-               cu.setUserstate(1);
-               cu.setWritedate(null);
-               clubUserRepository.save(cu);
-               al.setGubun(1);
-               al.setId(clubid);
-               al.setReceiveyn(false);
-               al.setUserid(clubUserRepository.getMaster(clubid));
-               al.setWritedate(new Date());
-               al.setClubid(clubid);
-               al.setMessage(message);
-               alarmRepository.save(al);
-               userFunction.sendAlarmSocketBoolean(clubUserRepository.getMaster(clubid), true);
-               return 1;
-            } else {
-               // 나이제한 걸림.! 가입불가
-               return 0;
-            }
-
-         } else {
-            if (c.getGender() == u.getGender()) {
-               if (c.getAgestart() < userage && c.getAgeend() > userage) {
-                  // 나이제한안걸리고 성별같으니 가입가능
-                  cu.setAuth(9);
-                  cu.setBreakdate(null);
-                  cu.setClubid(clubid);
-                  cu.setId(0);
-                  cu.setJoindate(null);
-                  cu.setMessage(message);
-                  cu.setReqdate(new Date());
-                  cu.setUserid(userid);
-                  cu.setUserstate(1);
-                  cu.setWritedate(null);
-                  clubUserRepository.save(cu);
-                  al.setGubun(1);
-                  al.setId(userid);
-                  al.setReceiveyn(false);
-                  al.setUserid(clubUserRepository.getMaster(clubid));
-                  al.setClubid(clubid);
-                  al.setWritedate(new Date());
-                  al.setMessage(message);
-                  alarmRepository.save(al);
-                  userFunction.sendAlarmSocketBoolean(clubUserRepository.getMaster(clubid), true);
-                  return 1;
-               } else {
-                  // 나이제한걸림! 가입불가
-                  return 0;
-               }
-
-            } else {
-               // 성별제한 걸림 가입불가.!
-               return 0;
-
-            }
-         }
-      } else {
-         return 0;
-      }
-
+          cu.setAuth(9);
+          cu.setBreakdate(null);
+          cu.setClubid(clubid);
+          cu.setId(0);
+          cu.setJoindate(null);
+          cu.setMessage(message);
+          cu.setReqdate(new Date());
+          cu.setUserid(userid);
+          cu.setUserstate(1);
+          cu.setWritedate(null);
+          clubUserRepository.save(cu);
+          al.setGubun(1);
+          al.setId(userid);
+          al.setReceiveyn(false);
+          al.setUserid(clubUserRepository.getMaster(clubid));
+          al.setClubid(clubid);
+          al.setWritedate(new Date());
+          al.setMessage(message);
+          alarmRepository.save(al);
+          
+          Map<String, Object> notification= new HashMap<>();
+          Map<String, Object> payload = new HashMap<>();
+          notification.put("notification", al.getAlarmid());
+          notification.put("gubun", al.getGubun());
+          notification.put("id", u.getUserid());
+          notification.put("nickName", u.getName());
+          notification.put("image", imgRepository.getIMG(1, u.getUserid()));
+          notification.put("message", al.getMessage());
+          notification.put("writedate", al.getWritedate());
+          notification.put("groupid", al.getClubid());
+          notification.put("groupName", c.getName());
+          payload.put("type", "notification");
+          payload.put("notification", notification);
+          
+          userFunction.sendAlarmSocket(clubUserRepository.getMaster(clubid), payload);
+          return 1;
+      } 
+      else return 0;
    }
 
    // 4-4-3 그룹 가입 신청 허락폼
@@ -1084,21 +1024,35 @@ public class ClubService {
    }
 
    // 4-4-4 그룹 가입 신청 허락
-   public void allowGroupJoin2(int masterid, int userid,int groupid,int notification ) {
-
-     /*  else {
-         clubUserRepository.deleteByClubidAndUserid(clubid, userid);
-         return 0;
-      }*/
-	   alarmRepository.readAlarmUpdate(notification);
+   public void allowGroupJoin2(int masterid, int userid,int groupid,int notifiId) {
+	   alarmRepository.readAlarmUpdate(notifiId);
 	   clubUserRepository.allowGroup(groupid, userid);
+	   
+	   Alarm al = new Alarm();
+	   al.setGubun(3);
+	   al.setId(masterid);
+	   al.setReceiveyn(false);
+	   al.setUserid(userid);
+	   al.setClubid(groupid);
+	   al.setWritedate(new Date());
+	   alarmRepository.save(al);
+	  
+	   Map<String, Object> notification= new HashMap<>();
+	   Map<String, Object> payload = new HashMap<>();
+	   notification.put("notification", al.getAlarmid());
+	   notification.put("gubun", al.getGubun());
+	   notification.put("id", masterid);
+	   notification.put("writedate", al.getWritedate());
+	   notification.put("groupid", al.getClubid());
+	   notification.put("groupName", clubRepository.groupInfo(groupid).getName());
+	   payload.put("type", "notification");
+	   payload.put("notification", notification);
+	   userFunction.sendAlarmSocket(userid, payload);
    }
    // 그룹가입 거절
    public void rejectGroup(int masterid, int userid,int groupid,int notification ) {
-	   
 	   alarmRepository.readAlarmUpdate(notification);
 	   clubUserRepository.deleteByClubidAndUserid(groupid, userid);
-	   
    }
 
    // 4-5-1 : 그룹 공지글 작성폼 보이기
@@ -1142,18 +1096,18 @@ public class ClubService {
          cn.setWritedate(new Date());
          clubnoticeRepository.save(cn);
          
-         List<Integer> users=clubUserRepository.getMemberId(clubid);
-         for(int i=0;i<users.size();i++) {
-        	 Alarm al=new Alarm();
-        	 al.setAlarmid(0);
-            al.setGubun(6);
-            al.setId(clubid);
-            al.setMessage("그룹의 새 공지글이 작성되었어요");
-            al.setReceiveyn(false);
-            al.setUserid(users.get(i));
-            al.setWritedate(new Date());
-            alarmRepository.save(al);
-         }
+//         List<Integer> users=clubUserRepository.getMemberId(clubid);
+//         for(int i=0;i<users.size();i++) {
+//        	 Alarm al=new Alarm();
+//        	 al.setAlarmid(0);
+//            al.setGubun(6);
+//            al.setId(clubid);
+//            al.setMessage("그룹의 새 공지글이 작성되었어요");
+//            al.setReceiveyn(false);
+//            al.setUserid(users.get(i));
+//            al.setWritedate(new Date());
+//            alarmRepository.save(al);
+//         }
          Map<String,Object> posts=new HashMap<>();
          List<Clubnotice> clubnotice=clubnoticeRepository.getClubnotices(clubid);
          List<Map<String,Object>> list=new ArrayList<>();
@@ -1274,14 +1228,14 @@ public class ClubService {
 
          noticecomRepository.save(nc);
          
-         Alarm al=new Alarm();
-         al.setGubun(7);
-         al.setId(clubnoticeRepository.getClubnotice(noticeid).getClubid());
-         al.setMessage("내공지에 댓글이달렸어요");
-         al.setReceiveyn(false);
-         al.setUserid(clubnoticeRepository.getClubnotice(noticeid).getUserid());
-         al.setWritedate(new Date());
-         alarmRepository.save(al);
+//         Alarm al=new Alarm();
+//         al.setGubun(7);
+//         al.setId(clubnoticeRepository.getClubnotice(noticeid).getClubid());
+//         al.setMessage("내공지에 댓글이달렸어요");
+//         al.setReceiveyn(false);
+//         al.setUserid(clubnoticeRepository.getClubnotice(noticeid).getUserid());
+//         al.setWritedate(new Date());
+//         alarmRepository.save(al);
          return 1;
       } else {
          return 0;
@@ -1302,16 +1256,13 @@ public class ClubService {
       }
 
 	public void deleteGroupUser(int token, int groupid) {
-		
-		clubUserRepository.deleteClubUser(token,groupid);
-		
-		
+//		clubUserRepository.deleteClubUser(token,groupid);
+		clubUserRepository.deleteByClubidAndUserid(groupid, token);
 	}
 
 	
 	//그룹멤버 정보
 	public Map<String,Object> groupMember(int token, int id, int page) {
-		System.out.printf("L1%d, %d, %d", token, id, page);
 		// TODO Auto-generated method stub
 		Map<String,Object> Map=new HashMap<>();
 		Map<String,Object> m=new HashMap<>();

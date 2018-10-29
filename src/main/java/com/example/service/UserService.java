@@ -130,13 +130,9 @@ public class UserService {
       } else if (seq != null)
          userid = seq;
 
-      int friendsCount = 0;
-      int clubsCount = 0;
-
-      friendsCount = (int)Math.ceil(friendRepository.friendsCount(userid) / 10.0);
-      clubsCount = (int)Math.ceil(clubUserRepository.getUserClubinfo(userid, 2).size() / 10.0);
+      int friendsCount = (int)Math.ceil(friendRepository.friendsCount(userid) / 10.0);
+      int clubsCount = (int)Math.ceil(clubUserRepository.getUserClubinfo(userid, 2).size() / 10.0);
       int firstNum = 0;
-
       List<Map<String, Object>> _friendsList = null;
 
       if (page != null) {  //페이지가 있을때

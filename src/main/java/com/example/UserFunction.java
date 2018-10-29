@@ -262,7 +262,7 @@ public class UserFunction {
 	 
 	     //알람 true/false 전송
 	      public void sendAlarmSocketBoolean(int userid,boolean bool) {
-	    	  template.convertAndSend("/topic/"+userid,bool);
+	    	  template.convertAndSend("/topic/"+userid, bool);
 	      }
 	      
 }
